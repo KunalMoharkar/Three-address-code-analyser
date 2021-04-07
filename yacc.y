@@ -11,6 +11,7 @@
 	set<ll> leaders;
 	vector<vector<ll> > bbgraph;
 	vector<pair<ll,ll> > loop_detected;
+	vector<vector<ll> > doms;
 	
 %}
 
@@ -159,6 +160,84 @@ void displayInst()
 	cout<<endl;
 }
 
+void DFS_util(int v, bool visited[], int skip)
+{
+    // Mark the current node as visited and
+    // print it
+    visited[v] = true;
+ 
+    // Recur for all the vertices adjacent
+    // to this vertex
+    vector<ll>::iterator i;
+    for (i = bbgraph[v].begin(); i != bbgraph[v].end(); ++i)
+        if (!visited[*i] && (*i != skip))
+            DFS_util(*i, visited, skip);
+}
+
+
+void DFS(int v, bool visited[])
+{
+    // Mark the current node as visited and
+    // print it
+    visited[v] = true;
+ 
+    // Recur for all the vertices adjacent
+    // to this vertex
+    vector<ll>::iterator i;
+    for (i = bbgraph[v].begin(); i != bbgraph[v].end(); ++i)
+        if (!visited[*i])
+            DFS(*i, visited);
+}
+
+void dominator_blocks()
+{
+	int i;
+	int V = bbgraph.size();
+	bool visited[V];
+	for(i=0;i<V;i++)
+	{
+		visited[i] = false;
+		vector<ll> t;
+		t.push_back(0);
+		doms.push_back(t);
+	}
+	DFS(0, visited);
+	for(i=1;i<V;i++)
+	{
+		bool temp[V];
+		int j;
+		for(j=0;j<V;j++)
+		{
+			temp[j] = false;
+		}
+		DFS_util(0, temp, i);
+		for(j=0;j<V;j++)
+		{
+			if(visited[j] && !temp[j])
+			{
+				doms[j].push_back(i);
+			}
+		}
+
+	}
+	cout << "\n";
+	cout << "All Dominator blocks for these blocks are: " << "\n";
+	cout << "\n";
+	for(i=0;i<V;i++)
+	{
+		int k;
+		cout << i << " : ";
+		for(k=0;k< doms[i].size();k++)
+		{
+			cout << doms[i][k] << " ";
+		}
+		cout << "\n";
+	}
+	
+}
+
+
+
 
 bool isCyclicUtil(ll v, bool visited[], bool *recStack)
 {
@@ -193,7 +272,6 @@ bool isCyclicUtil(ll v, bool visited[], bool *recStack)
     return false;
 }
   
-// Returns true if the graph contains a cycle, else false.
 void isCyclic()
 {
     int V = bbgraph.size();
@@ -288,6 +366,7 @@ int main()
 	genFlowGraph();
 	displayFlowGraph();
 	isCyclic();
+	dominator_blocks();
 	
     return 0;
 }
