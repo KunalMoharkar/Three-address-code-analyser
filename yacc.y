@@ -10,6 +10,7 @@
 	map<ll,vector<string> > basicBlock;
 	set<ll> leaders;
 	vector<vector<ll> > bbgraph;
+	vector<pair<ll,ll> > loop_detected;
 	
 %}
 
@@ -158,9 +159,86 @@ void displayInst()
 	cout<<endl;
 }
 
+
+bool isCyclicUtil(ll v, bool visited[], bool *recStack)
+{
+	int f = 0;
+    if(visited[v] == false)
+    {
+        // Mark the current node as visited and part of recursion stack
+        visited[v] = true;
+        recStack[v] = true;
+
+        // Recur for all the vertices adjacent to this vertex
+        vector<ll>::iterator i;
+        for(i = bbgraph[v].begin(); i != bbgraph[v].end(); ++i)
+        {
+            if (!visited[*i] && isCyclicUtil(*i, visited, recStack) )
+            {
+				f = 1;
+			}
+            else if (recStack[*i])
+            {
+				f = 1;
+				loop_detected.push_back({*i,v});
+			}
+        }
+		if(f == 1)
+		{
+			return true;
+		}
+  
+    }
+    recStack[v] = false;  // remove the vertex from recursion stack
+    return false;
+}
+  
+// Returns true if the graph contains a cycle, else false.
+void isCyclic()
+{
+    int V = bbgraph.size();
+	//cout << V << "\n";
+	// Mark all the vertices as not visited and not part of recursion stack
+    bool *visited = new bool[V];
+    bool *recStack = new bool[V];
+    int i;
+    for(i = 0; i < bbgraph.size(); i++)
+    {
+        visited[i] = false;
+        recStack[i] = false;
+    }
+	int f;
+	f = 0;
+    // Call the recursive helper function to detect cycle in different
+    // DFS trees
+    for(int i = 0; i < bbgraph.size(); i++)
+	{
+    	if(isCyclicUtil(i, visited, recStack))
+		{
+			f = 1;
+		}
+	}
+	if(f == 1)
+	{
+		cout << "Loop detected in the code" << "\n";
+		cout << "\n";
+		cout << "Total no. of loop pairs are: " << loop_detected.size() << "\n";
+		cout << '\n';
+		int j;
+		for(j=0; j<loop_detected.size(); j++)
+		{
+			cout << "Loop detected between blocks:" << loop_detected[j].first << " ---- " << loop_detected[j].second << "\n";
+		}
+	}
+    else
+	{
+		cout << "No loop detected at all" << "\n";
+	}
+}
+
 void initialize_instuction_list()
 {
-   instList[0] = "c = 5";
+  /* instList[0] = "c = 5";
    instList[1] = "b = 5";
    instList[2] = "t0 = b + d";
    instList[3] =  "a = t0";
@@ -169,10 +247,22 @@ void initialize_instuction_list()
    instList[6] =  "b = 8";
    instList[7] =  "t2 = b - a";
    instList[8] = "a = t2";
-   instList[9] =  "if a < b goto 11";
-   instList[10] = "goto 12" ;
-   instList[11] = "c = d";
-   instList[12] = "b = 9";
+   instList[9] =  "if a < b goto 10";
+   instList[10] = "b = 3";
+   instList[11] = "goto 12" ;
+   instList[12] = "c = d";
+   instList[13] = "b = 9";
+   instList[14] = "goto 0";*/
+
+   instList[0] = "f = 1";
+   instList[1] = "i = 2";
+   instList[2] = "if i > x goto 8";
+   instList[3] = "t1 = f * i";
+   instList[4] = "f = t1";
+   instList[5] = "t2 = i + 1";
+   instList[6] = "i = t2";
+   instList[7] = "goto 2";
+   instList[8] = "b = 5";
 
    cout<<"INITIALED"<<"\n";
 
@@ -197,6 +287,7 @@ int main()
 	displayBasicBlocks();
 	genFlowGraph();
 	displayFlowGraph();
+	isCyclic();
 	
     return 0;
 }
