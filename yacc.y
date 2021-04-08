@@ -702,6 +702,8 @@ void initialize_instuction_list(char* inst)
    instList[13] = "b = 9";
    instList[14] = "goto 0";
 
+   */
+/*
    instList[0] = "f = a * 2";
    instList[1] = "i = a / 8";
    instList[2] = "m = a * 0";
@@ -722,6 +724,8 @@ void initialize_instuction_list(char* inst)
    instList[17] = "b = 6 / 3";
    instList[18] = "b = 6 * 3";
    instList[18] = "goto 1";
+
+   */
 
 
 /*	
@@ -769,8 +773,6 @@ int main()
 	isCyclic();
 	dominator_blocks();
 	detect_unused_code();
-	
-
 	local_optimizations();
 	
     return 0;
