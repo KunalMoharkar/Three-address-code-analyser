@@ -1,10 +1,13 @@
 %{
 	#include<bits/stdc++.h>
+    #define YYSTYPE char *
 	typedef long long ll;
+
 	using namespace std;
     void yyerror(char *msg);
-    extern int yylex(void);  	
-	
+    extern int yylex(void);  
+    extern char *yytext;	
+	int insCount;
 	
 	map<ll,string> instList;
 	map<ll,vector<string> > basicBlock;
@@ -12,12 +15,20 @@
 	vector<vector<ll> > bbgraph;
 	vector<pair<ll,ll> > loop_detected;
 	vector<vector<ll> > doms;
+    void initialize_instuction_list(char* inst);
 	
 %}
 
-%token INS
+%token ALPHANUM NL OP CL
+
 %%
-ss: 
+ss:	OP Inst 
+;
+Inst :  ALPHANUM{ initialize_instuction_list(yytext);} Inst
+        | CL
+        | ";"
+;
+
 %%
 
 ll to_int(string val)
@@ -673,7 +684,7 @@ void local_optimizations()
 }
 
 
-void initialize_instuction_list()
+void initialize_instuction_list(char* inst)
 {
   /* instList[0] = "c = 5";
    instList[1] = "b = 5";
@@ -689,7 +700,7 @@ void initialize_instuction_list()
    instList[11] = "goto 12" ;
    instList[12] = "c = d";
    instList[13] = "b = 9";
-   instList[14] = "goto 0";*/
+   instList[14] = "goto 0";
 
    instList[0] = "f = a * 2";
    instList[1] = "i = a / 8";
@@ -725,8 +736,7 @@ void initialize_instuction_list()
    instList[8] = "b = 5";
 
    */
-
-   cout<<"INITIALED"<<"\n";
+    instList[insCount++]=inst;
 
 }
 
@@ -739,9 +749,16 @@ void yyerror(char* s)
 
 int main()
 {
+    extern FILE* yyin;
+    insCount = 0;
+    printf("\nEnter file name: ");
+    char filename[40];
+    scanf("%s",&filename);
+    yyin=fopen(filename,"r"); 
+    //printf("Enter:\t");
 
-	yyparse();
-	initialize_instuction_list();
+    yyparse(); 
+	//initialize_instuction_list();
 	displayInst();
 
 	genBasicBlock();
