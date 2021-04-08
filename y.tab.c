@@ -1967,6 +1967,54 @@ string get_neutral_expression(string exp)
 }
 
 
+//performs constant folding
+
+string get_constant_folded_expression(string exp)
+{
+	vector<string> res = split_expression(exp);
+
+	string operation = res[3];
+	string post = res[4];
+	string pre = res[2];
+
+	if(is_constant(post) && is_constant(pre))
+	{	
+		int num1 = stoi(pre);
+		int num2 = stoi(post);
+		int result;
+
+		if(operation == "+")
+		{
+			result = num1 + num2;
+		}
+		else if(operation == "-")
+		{
+			result = num1 - num2;
+		}
+		else if(operation == "*")
+		{
+			result = num1*num2;
+		}
+		else if(operation == "/")
+		{
+			result = num1/num2;
+		}
+
+		pre = to_string(result);
+		post = "";
+		operation = "";
+	}
+
+	res[2] = pre;
+	res[4] = post;
+	res[3] = operation;
+
+	return combine_expression(res);
+
+}
+
+
+
 void local_optimizations()
 {	
 
@@ -1988,6 +2036,27 @@ void local_optimizations()
 		}
 		cout<<endl;
 	}
+
+
+	cout<<"\n\nAfter Constant Folding : \n\n";
+
+	for(map<ll,vector<string> >::iterator it=basicBlock.begin();it!=basicBlock.end();it++)
+	{
+		cout<<"Block "<<it->first<<":"<<endl;
+		for(ll i=0;i<it->second.size();i++)
+		{	
+			if(is_arithmetic_expr(it->second[i]))
+			{
+				if(is_candidate_of_optimization(it->second[i]))
+				{
+					it->second[i] = get_constant_folded_expression(it->second[i]);
+				}
+			}
+			cout<<"\t"<<it->second[i]<<endl;
+		}
+		cout<<endl;
+	}
+
 
 	cout<<"\n\nAfter Strength reduction Optimization : \n\n";
 
@@ -2044,6 +2113,10 @@ void initialize_instuction_list()
    instList[12] = "b = c - 0";
    instList[13] = "b = d + 0";
    instList[14] = "b = e / 1";
+   instList[15] = "b = 7 - 2";
+   instList[16] = "b = 6 + 1";
+   instList[17] = "b = 6 / 3";
+   instList[18] = "b = 6 * 3";
 
 
 /*	
