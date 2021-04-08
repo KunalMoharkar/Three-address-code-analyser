@@ -1905,9 +1905,89 @@ string get_reduced_expression(string exp)
 
 }
 
+//eliminates neutral expressions
+//assumes constant always on rightmost
+string get_neutral_expression(string exp)
+{
+	vector<string> res = split_expression(exp);
+
+	string operation = res[3];
+	string post = res[4];
+	string pre = res[2];
+
+	if(operation == "*")
+	{
+		if(post == "0")
+		{
+			post = "";
+			operation = "";
+			pre = "0";
+		}
+		else if(post == "1")
+		{
+			post = "";
+			operation = "";
+		}				 
+	}
+	else if(operation == "/")
+	{
+		if(post == "1")
+		{
+			post = "";
+			operation = "";
+		}				 
+	}
+	else if(operation == "+")
+	{	
+		if(post == "0")
+		{
+			post = "";
+			operation = "";
+		}		 
+	}
+	else if(operation == "-")
+	{
+		if(post == "0")
+		{
+			post = "";
+			operation = "";
+		}				 
+	}
+
+
+	
+
+
+
+	res[2] = pre;
+	res[4] = post;
+	res[3] = operation;
+
+	return combine_expression(res);
+}
+
 
 void local_optimizations()
-{
+{	
+
+	cout<<"\n\nAfter Neutral Elimination : \n\n";
+
+	for(map<ll,vector<string> >::iterator it=basicBlock.begin();it!=basicBlock.end();it++)
+	{
+		cout<<"Block "<<it->first<<":"<<endl;
+		for(ll i=0;i<it->second.size();i++)
+		{	
+			if(is_arithmetic_expr(it->second[i]))
+			{
+				if(is_candidate_of_optimization(it->second[i]))
+				{
+					it->second[i] = get_neutral_expression(it->second[i]);
+				}
+			}
+			cout<<"\t"<<it->second[i]<<endl;
+		}
+		cout<<endl;
+	}
 
 	cout<<"\n\nAfter Strength reduction Optimization : \n\n";
 
@@ -1951,14 +2031,19 @@ void initialize_instuction_list()
 
    instList[0] = "f = a * 2";
    instList[1] = "i = a / 8";
-   instList[2] = "goto 8";
-   instList[3] = "t1 = f * i";
-   instList[4] = "f = t1";
-   instList[5] = "t2 = i + 1";
-   instList[6] = "i = t2";
-   instList[7] = "goto 2";
-   instList[8] = "goto 9";
-   instList[9] = "b = 9";
+   instList[2] = "m = a * 0";
+   instList[3] = "n = a * 1";
+   instList[4] = "goto 10";
+   instList[5] = "t1 = f * i";
+   instList[6] = "f = t1";
+   instList[7] = "t2 = i + 1";
+   instList[8] = "i = t2";
+   instList[9] = "goto 2";
+   instList[10] = "goto 11";
+   instList[11] = "b = 9";
+   instList[12] = "b = c - 0";
+   instList[13] = "b = d + 0";
+   instList[14] = "b = e / 1";
 
 
 /*	
