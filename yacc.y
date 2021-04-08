@@ -15,12 +15,9 @@
 	
 %}
 
+%token INS
 %%
-ss:		
-		{
-			
-		}
-
+ss: 
 %%
 
 ll to_int(string val)
@@ -703,7 +700,7 @@ void initialize_instuction_list()
    instList[6] = "f = t1";
    instList[7] = "t2 = i + 1";
    instList[8] = "i = t2";
-   instList[9] = "goto 2";
+   instList[9] = "goto 1";
    instList[10] = "goto 11";
    instList[11] = "b = 9";
    instList[12] = "b = c - 0";
@@ -713,6 +710,7 @@ void initialize_instuction_list()
    instList[16] = "b = 6 + 1";
    instList[17] = "b = 6 / 3";
    instList[18] = "b = 6 * 3";
+   instList[18] = "goto 1";
 
 
 /*	
@@ -742,7 +740,7 @@ void yyerror(char* s)
 int main()
 {
 
-	//yyparse();
+	yyparse();
 	initialize_instuction_list();
 	displayInst();
 
