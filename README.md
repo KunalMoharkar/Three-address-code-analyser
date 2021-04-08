@@ -6,3 +6,5 @@ execution instructions -
 run the bash file:
 
 ./execute.sh
+
+Enter your input file name 
