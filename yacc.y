@@ -314,6 +314,49 @@ void isCyclic()
 	}
 }
 
+
+
+void detect_unused_code()
+{	
+
+	//do a simple DFS from start block
+	//blocks that cannot be reached from start block are dead 
+	int i;
+	int V = bbgraph.size();
+
+	bool visited[V];
+
+	for(i=0;i<V;i++)
+	{
+		visited[i] = false;
+	}
+
+	DFS(0, visited);
+
+
+	cout<<"\nDead Code detection :\n\n";
+
+	int flag = 0;
+
+	for(i=0;i<V;i++)
+	{
+		if(visited[i] == false)
+		{	
+			flag = 1;
+			cout<<"basic block number: "<<i<<" is a dead code"<<"\n";
+		}
+	}
+
+	if(flag){
+
+		cout<<"No Dead code detected"<<"\n";
+
+	}
+
+
+}
+
+
 void initialize_instuction_list()
 {
   /* instList[0] = "c = 5";
@@ -334,6 +377,19 @@ void initialize_instuction_list()
 
    instList[0] = "f = 1";
    instList[1] = "i = 2";
+   instList[2] = "goto 8";
+   instList[3] = "t1 = f * i";
+   instList[4] = "f = t1";
+   instList[5] = "t2 = i + 1";
+   instList[6] = "i = t2";
+   instList[7] = "goto 2";
+   instList[8] = "goto 9";
+   instList[9] = "b = 9";
+
+
+/*	
+   instList[0] = "f = 1";
+   instList[1] = "i = 2";
    instList[2] = "if i > x goto 8";
    instList[3] = "t1 = f * i";
    instList[4] = "f = t1";
@@ -341,6 +397,8 @@ void initialize_instuction_list()
    instList[6] = "i = t2";
    instList[7] = "goto 2";
    instList[8] = "b = 5";
+
+   */
 
    cout<<"INITIALED"<<"\n";
 
@@ -367,6 +425,7 @@ int main()
 	displayFlowGraph();
 	isCyclic();
 	dominator_blocks();
+	detect_unused_code();
 	
     return 0;
 }
