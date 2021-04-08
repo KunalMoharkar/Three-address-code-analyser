@@ -347,7 +347,7 @@ void detect_unused_code()
 		}
 	}
 
-	if(flag){
+	if(!flag){
 
 		cout<<"No Dead code detected"<<"\n";
 

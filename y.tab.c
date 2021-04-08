@@ -1719,10 +1719,12 @@ void isCyclic()
 }
 
 
+
 void detect_unused_code()
 {	
 
-
+	//do a simple DFS from start block
+	//blocks that cannot be reached from start block are dead 
 	int i;
 	int V = bbgraph.size();
 
@@ -1749,7 +1751,7 @@ void detect_unused_code()
 		}
 	}
 
-	if(flag){
+	if(!flag){
 
 		cout<<"No Dead code detected"<<"\n";
 
