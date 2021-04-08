@@ -40,6 +40,22 @@
 extern int yydebug;
 #endif
 
+/* Token type.  */
+#ifndef YYTOKENTYPE
+# define YYTOKENTYPE
+  enum yytokentype
+  {
+    ALPHANUM = 258,
+    NL = 259,
+    OP = 260,
+    CL = 261
+  };
+#endif
+/* Tokens.  */
+#define ALPHANUM 258
+#define NL 259
+#define OP 260
+#define CL 261
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
