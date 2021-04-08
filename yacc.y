@@ -356,6 +356,176 @@ void detect_unused_code()
 
 }
 
+//splits the given 3 address instruction
+std::vector<std::string> split_expression(string str)
+{
+
+    string word = "";
+	vector<string> result;
+    for (auto x : str) 
+    {
+        if (x == ' ')
+        {
+            result.push_back(word);
+            word = "";
+        }
+        else {
+            word = word + x;
+        }
+    }
+    
+	result.push_back(word);
+
+	return result;
+}
+
+//comnines the splitted expression into a single string  
+string combine_expression(std::vector<std::string> res)
+{	
+	string result = "";
+	int i =0;
+
+
+	for(i =  0 ; i< res.size(); i++)
+	{	
+		result += res[i];
+
+		if(i != res.size()-1)
+		{
+			result += " ";
+		}
+
+	}
+
+	return result;
+}
+
+
+//checks if expression is normal assignment or
+//arithmetic computation
+int is_candidate_of_optimization(string exp)
+{	
+	vector<string> res = split_expression(exp);
+
+	if(res.size() == 5){
+
+		return 1;
+	}
+
+	return 0;
+}
+
+
+//checks if expression is not a goto or a conditional
+int is_arithmetic_expr(string exp)
+{
+	int is_goto = exp.find("goto");
+	int is_if = exp.find("if");
+
+	if(is_goto == -1 && is_if == -1)
+	{
+		return 1;
+	}
+	
+	return 0;
+}
+
+//cheks if number is perfect power of 2
+bool is_power_of_two(string s)
+{
+	int n = stoi(s);
+	if(n==0)
+	{
+   		return false;
+	}
+
+   return (ceil(log2(n)) == floor(log2(n)));
+
+}
+
+
+//power of 2
+int cal_power(int num)
+{
+	return (log2(num));
+}
+
+//checks if a string is a numerical value
+bool is_constant(string s)
+{
+    std::string::const_iterator it = s.begin();
+    while (it != s.end() && std::isdigit(*it)) ++it;
+    return !s.empty() && it == s.end();
+}
+
+
+//checks if a expresion arithmetic strenght can be reduced
+//via shift operations 
+//for simplicity assumes that constant is always present on right most
+string get_reduced_expression(string exp)
+{
+	vector<string> res = split_expression(exp);
+
+	string operation = res[3];
+	string operand = res[4];
+
+	if(operation == "*")
+	{
+		if(is_constant(operand))
+		{
+			 if(is_power_of_two(operand))
+			 {	
+				 operand = to_string(cal_power(stoi(operand)));
+				 operation = "<<";
+			 }
+		}
+	}
+
+	if(operation == "/")
+	{
+		if(is_constant(operand))
+		{
+			 if(is_power_of_two(operand))
+			 {	
+				 operand = to_string(cal_power(stoi(operand)));
+				 operation = ">>";
+			 }
+		}
+	}
+
+
+	res[4] = operand;
+	res[3] = operation;
+
+	return combine_expression(res);
+
+}
+
+
+void local_optimizations()
+{
+
+	cout<<"\n\nAfter Strength reduction Optimization : \n\n";
+
+	for(map<ll,vector<string> >::iterator it=basicBlock.begin();it!=basicBlock.end();it++)
+	{
+		cout<<"Block "<<it->first<<":"<<endl;
+		for(ll i=0;i<it->second.size();i++)
+		{	
+			if(is_arithmetic_expr(it->second[i]))
+			{
+				if(is_candidate_of_optimization(it->second[i]))
+				{
+					it->second[i] = get_reduced_expression(it->second[i]);
+				}
+			}
+			cout<<"\t"<<it->second[i]<<endl;
+		}
+		cout<<endl;
+	}
+
+}
+
 
 void initialize_instuction_list()
 {
@@ -375,8 +545,8 @@ void initialize_instuction_list()
    instList[13] = "b = 9";
    instList[14] = "goto 0";*/
 
-   instList[0] = "f = 1";
-   instList[1] = "i = 2";
+   instList[0] = "f = a * 2";
+   instList[1] = "i = a / 8";
    instList[2] = "goto 8";
    instList[3] = "t1 = f * i";
    instList[4] = "f = t1";
@@ -426,6 +596,9 @@ int main()
 	isCyclic();
 	dominator_blocks();
 	detect_unused_code();
+	
+
+	local_optimizations();
 	
     return 0;
 }
